@@ -1,0 +1,71 @@
+GoLangPhilly - Writing a slack bot in Go
+Slackbot in go, running on Google AppEngine
+8 Sep 2015
+Tags: golang, slack, appengine
+
+Darrel Herbst
+DramaFever
+dherbst@gmail.com
+http://github.com/dherbst
+@darrelherbst
+
+* GoLangPhilly - Writing a slack bot in go
+
+This talk explains how to run a slackbot written in go on AppEngine
+
+.image slack.png
+
+
+
+* Slack - is a chat site like irc
+
+- has channels
+- can be public or private
+- has mobile apps; android/iOS
+- history
+- searchable
+- allows you to create your own integrations.
+    * Send info from slack to your site via a web url
+    * Send info from your site to slack via a web url
+
+* Config a command to send information to your site
+
+.image integration.png
+
+Choose "make your own"
+
+.image command.png
+
+* The url for slack to send you info
+
+.image config.png
+
+* Now you need a site to receive the post, and return something
+
+.image appengine.png
+
+Download the go sdk for appengine at https://cloud.google.com/appengine/docs/go/
+
+Get started quickly by creating
+
+- app.yaml
+- handlers.go
+- static folder for index.html, images, etc.
+
+* app.yaml is where you define your application
+
+.code ../www/app.yaml
+
+* handlers.go
+
+create handlers.go with an `init` function
+
+.code ../www/handlers.go /^package/,/^}/
+
+* api.go holds the `CommandHandler`
+
+.code ../www/api.go /^\/\/ Dispatch the command/,/^}/
+
+* We process the command like this
+
+.code ../www/api.go /^\/\/ UnMarshalCommand takes/,/^}/

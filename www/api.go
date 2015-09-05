@@ -17,7 +17,7 @@ type SlackCommand struct {
 	Token       string
 }
 
-// Takes the request from slack, returns a SlackCommand object
+// UnMarshalCommand takes the request from slack, returns a SlackCommand object
 func UnMarshalCommand(r *http.Request) (*SlackCommand, error) {
 	c := &SlackCommand{}
 
@@ -37,8 +37,10 @@ func UnMarshalCommand(r *http.Request) (*SlackCommand, error) {
 // Dispatch the command based on the parameter
 func CommandHandler(w http.ResponseWriter, r *http.Request) {
 
-	command := r.FormValue("command")
-	text := r.FormValue("text")
+	command, err := UnMarshalCommand(r)
+	if err != nil {
+		http.Error(w, "Could not process command", http.StatusBadRequest)
+	}
 
-	fmt.Fprintf(w, "Hello there command=%v text=%v", command, text)
+	fmt.Fprintf(w, "Hello there command=%v text=%v", command.Command, command.Text)
 }
