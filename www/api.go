@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// SlackCommand is a struct holding the values that slack will post to our bot
 type SlackCommand struct {
 	ChannelId   string
 	ChannelName string
@@ -15,6 +16,13 @@ type SlackCommand struct {
 	TeamDomain  string
 	Text        string
 	Token       string
+}
+
+// SlackResult holds the result of processing the command.
+type SlackResult struct {
+	IsTextResult bool
+	Text         string
+	Command      *SlackCommand
 }
 
 // UnMarshalCommand takes the request from slack, returns a SlackCommand object
@@ -40,7 +48,35 @@ func CommandHandler(w http.ResponseWriter, r *http.Request) {
 	command, err := UnMarshalCommand(r)
 	if err != nil {
 		http.Error(w, "Could not process command", http.StatusBadRequest)
+		return
 	}
 
-	fmt.Fprintf(w, "Hello there command=%v text=%v", command.Command, command.Text)
+	result, err := ProcessCommand(command)
+	if err != nil {
+		http.Error(w, "Error processing result", http.StatusInternalServerError)
+		return
+	}
+	if result.IsTextResult {
+		fmt.Fprintf(w, "%v", result.Text)
+	} else {
+		err = SendResult(result)
+		if err != nil {
+			http.Error(w, "Error processing result", http.StatusInternalServerError)
+			return
+		}
+		http.Error(w, "", http.StatusNoContent) // return a 204
+	}
+}
+
+// Determine what do to with the different text commands
+func ProcessCommand(cmd *SlackCommand) (*SlackResult, error) {
+	result := &SlackResult{}
+
+	return result, nil
+}
+
+// SendResult sends the result.Text to the same channel it came from
+func SendResult(result *SlackResult) error {
+
+	return nil
 }

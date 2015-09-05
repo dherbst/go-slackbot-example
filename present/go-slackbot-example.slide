@@ -44,7 +44,7 @@ Choose "make your own"
 
 .image appengine.png
 
-Download the go sdk for appengine at https://cloud.google.com/appengine/docs/go/
+Download the go sdk for appengine at [[https://cloud.google.com/appengine/docs/go/]]
 
 Get started quickly by creating
 
@@ -58,7 +58,7 @@ Get started quickly by creating
 
 * handlers.go
 
-create handlers.go with an `init` function
+Create handlers.go with an `init` function
 
 .code ../www/handlers.go /^package/,/^}/
 
@@ -66,6 +66,6 @@ create handlers.go with an `init` function
 
 .code ../www/api.go /^\/\/ Dispatch the command/,/^}/
 
-* We process the command like this
+* We conver the request into a struct:
 
 .code ../www/api.go /^\/\/ UnMarshalCommand takes/,/^}/
