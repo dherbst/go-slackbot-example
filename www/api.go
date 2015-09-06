@@ -1,6 +1,7 @@
 package slackbot
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -19,11 +20,25 @@ type SlackCommand struct {
 	Token       string
 }
 
-// SlackResult holds the result of processing the command.
+// SlackResult holds the result of processing the command.  json encoding is the `payload`
+// message to a slack incoming hook integration.
 type SlackResult struct {
-	IsTextResult bool
-	Text         string
-	Command      *SlackCommand
+	Command      *SlackCommand      `json:"-"` // ignored
+	IsTextResult bool               `json:"-"`
+	Text         string             `json:"text,omitempty"`
+	Username     string             `json:"username,omitempty"`
+	IconUrl      string             `json:"icon_url,omitempty"`
+	IconEmoji    string             `json:"icon_emoji,omitempty"`
+	Channel      string             `json:"channel,omitempty"`
+	Attachments  []*SlackAttachment `json:"attachments,omitempty"`
+}
+
+// SlackAttachment is a message attachment
+type SlackAttachment struct {
+	ImageUrl string `json:"image_url,omitempty"`
+	ThumbUrl string `json:"thumb_url,omitempty"`
+	Text     string `json:"text,omitempty"`
+	Fallback string `json:"fallback,omitempty"`
 }
 
 // UnMarshalCommand takes the request from slack, returns a SlackCommand object
@@ -107,16 +122,34 @@ func UnknownCommand(cmd *SlackCommand) (*SlackResult, error) {
 
 // SendResult sends the result.Text to the same channel it came from
 func SendResult(result *SlackResult) error {
+	if result.IsTextResult {
+		return errors.New("Sending text result to non-text send")
+	}
 
-	return nil
+	hook, err := GetHook(result)
+	if err != nil {
+		return err
+	}
+
+	err = PostHook(hook, result)
+
+	return err
 }
 
 // GifCommand looks up the gif in the datastore and returns the url to it
 func GifCommand(cmd *SlackCommand) (*SlackResult, error) {
+
+	//a := &SlackAttachment{ImageUrl: "http://dramafeverslack.appspot.com/gif/heirs7_1.gif"}
+	//attachments := make([]*SlackAttachment, 1)
+	//attachments[0] = a
 	result := &SlackResult{
 		IsTextResult: false,
 		Text:         "",
-		Command:      cmd,
+		Attachments: []*SlackAttachment{
+			&SlackAttachment{
+				ImageUrl: "http://dramafeverslack.appspot.com/gif/heirs7_1.gif"},
+		},
+		Command: cmd,
 	}
 	return result, nil
 }
