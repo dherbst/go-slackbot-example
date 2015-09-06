@@ -77,7 +77,8 @@ func ProcessCommand(cmd *SlackCommand) (*SlackResult, error) {
 	switch commandWord { // HL
 	case "hello":
 		result, err = HelloCommand(cmd)
-
+	case "gif":
+		result, err = GifCommand(cmd)
 	default:
 		result, err = UnknownCommand(cmd)
 	}
@@ -108,4 +109,14 @@ func UnknownCommand(cmd *SlackCommand) (*SlackResult, error) {
 func SendResult(result *SlackResult) error {
 
 	return nil
+}
+
+// GifCommand looks up the gif in the datastore and returns the url to it
+func GifCommand(cmd *SlackCommand) (*SlackResult, error) {
+	result := &SlackResult{
+		IsTextResult: false,
+		Text:         "",
+		Command:      cmd,
+	}
+	return result, nil
 }

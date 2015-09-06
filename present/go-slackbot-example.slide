@@ -86,3 +86,13 @@ Create handlers.go with an `init` function
 .image hellocommand.png
 
 .image hellocommandresult.png
+
+* So how do you talk to the #channel?
+
+Slack slash-commands return text as the body of the response.  Only the person calling
+the slash-command sees the response.
+
+If you want your bot to say something everyone can see, you need to call back the web
+incoming url to the channel the command is coming from.
+
+_Or_you_can_implement_a_full_bot_that_has_the_ability_to_be_in_every_room_ but that is beyond the scope of this talk.
