@@ -1,4 +1,4 @@
-go-slackbox-example
+go-slackbot-example
 ===================
 
 An Example of a slack integration.
