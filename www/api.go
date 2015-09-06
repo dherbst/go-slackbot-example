@@ -3,6 +3,7 @@ package slackbot
 import (
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // SlackCommand is a struct holding the values that slack will post to our bot
@@ -44,22 +45,21 @@ func UnMarshalCommand(r *http.Request) (*SlackCommand, error) {
 
 // Dispatch the command based on the parameter
 func CommandHandler(w http.ResponseWriter, r *http.Request) {
-
 	command, err := UnMarshalCommand(r)
 	if err != nil {
 		http.Error(w, "Could not process command", http.StatusBadRequest)
 		return
 	}
 
-	result, err := ProcessCommand(command)
+	result, err := ProcessCommand(command) // HL
 	if err != nil {
 		http.Error(w, "Error processing result", http.StatusInternalServerError)
 		return
 	}
-	if result.IsTextResult {
+	if result.IsTextResult { // HL
 		fmt.Fprintf(w, "%v", result.Text)
 	} else {
-		err = SendResult(result)
+		err = SendResult(result) // HL
 		if err != nil {
 			http.Error(w, "Error processing result", http.StatusInternalServerError)
 			return
@@ -72,8 +72,9 @@ func CommandHandler(w http.ResponseWriter, r *http.Request) {
 func ProcessCommand(cmd *SlackCommand) (*SlackResult, error) {
 	var result *SlackResult
 	var err error
-	switch cmd.Text {
-
+	parts := strings.Split(cmd.Text, " ")
+	commandWord := parts[0]
+	switch commandWord { // HL
 	case "hello":
 		result, err = HelloCommand(cmd)
 
@@ -83,6 +84,7 @@ func ProcessCommand(cmd *SlackCommand) (*SlackResult, error) {
 	return result, err
 }
 
+// HelloCommand says hi back to the user that said hello
 func HelloCommand(cmd *SlackCommand) (*SlackResult, error) {
 	result := &SlackResult{
 		IsTextResult: true,

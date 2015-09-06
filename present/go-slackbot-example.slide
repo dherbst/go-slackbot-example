@@ -25,8 +25,9 @@ This talk explains how to run a slackbot written in go on AppEngine
 - history
 - searchable
 - allows you to create your own integrations.
-    * Send info from slack to your site via a web url
-    * Send info from your site to slack via a web url
+ 1. Create a /command which sends info from slack to your site via a web url
+ 2. Create a bot user which sees all messages in the channel
+ 3. Send a message from your site to slack via a web url
 
 * Config a command to send information to your site
 
@@ -66,6 +67,22 @@ Create handlers.go with an `init` function
 
 .code ../www/api.go /^\/\/ Dispatch the command/,/^}/
 
-* We conver the request into a struct:
+* Convert the request into a struct:
 
 .code ../www/api.go /^\/\/ UnMarshalCommand takes/,/^}/
+
+* Dispatch the SlackCommand to the ProcessCommand function
+
+.code ../www/api.go /^\/\/ Dispatch the command based on the parameter/,/^}/
+
+* ProcessCommand examines the SlackCommand and performs an action on it
+
+.code ../www/api.go /^\/\/ Determine what do to with the different text commands/,/^}/
+
+* Say hi, slackbot
+
+.code ../www/api.go /^\/\/ HelloCommand says hi back to the user that said hello/,/^}/
+
+.image hellocommand.png
+
+.image hellocommandresult.png
