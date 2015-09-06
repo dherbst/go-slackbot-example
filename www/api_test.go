@@ -30,5 +30,39 @@ func TestUnMarshalCommand(t *testing.T) {
 	if c.Token != "tokenhere" {
 		t.Fatalf("Did not get expected token, got %v", c.Token)
 	}
+	if c.Command != "/fight" {
+		t.Fatalf("Did not get expected command, got %v", c.Command)
+	}
+	if c.Text != "for_the_users" {
+		t.Fatalf("Did not get expected text, got %v", c.Text)
+	}
 
+}
+
+func TestHelloCommand(t *testing.T) {
+	cmd := &SlackCommand{Text: "hello", UserName: "dar"}
+	result, err := HelloCommand(cmd)
+	if err != nil {
+		t.Fatalf("got error %v", err)
+	}
+	if result.IsTextResult != true {
+		t.Fatalf("HelloCommand should be TextResult")
+	}
+	if result.Text != "hi dar" {
+		t.Fatalf("Did not get expected Text got %v", result.Text)
+	}
+}
+
+func TestUnknownCommand(t *testing.T) {
+	cmd := &SlackCommand{Text: "whaaaat", UserName: "dar"}
+	result, err := ProcessCommand(cmd)
+	if err != nil {
+		t.Fatalf("got error %v", err)
+	}
+	if result.IsTextResult != true {
+		t.Fatalf("Unknown command should be TextResult")
+	}
+	if result.Text != "I don't know that command, sorry" {
+		t.Fatalf("Did not get expected Text got %v", result.Text)
+	}
 }

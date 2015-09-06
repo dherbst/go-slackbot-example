@@ -70,8 +70,35 @@ func CommandHandler(w http.ResponseWriter, r *http.Request) {
 
 // Determine what do to with the different text commands
 func ProcessCommand(cmd *SlackCommand) (*SlackResult, error) {
-	result := &SlackResult{}
+	var result *SlackResult
+	var err error
+	switch cmd.Text {
 
+	case "hello":
+		result, err = HelloCommand(cmd)
+
+	default:
+		result, err = UnknownCommand(cmd)
+	}
+	return result, err
+}
+
+func HelloCommand(cmd *SlackCommand) (*SlackResult, error) {
+	result := &SlackResult{
+		IsTextResult: true,
+		Text:         fmt.Sprintf("hi %v", cmd.UserName),
+		Command:      cmd,
+	}
+
+	return result, nil
+}
+
+func UnknownCommand(cmd *SlackCommand) (*SlackResult, error) {
+	result := &SlackResult{
+		IsTextResult: true,
+		Text:         "I don't know that command, sorry",
+		Command:      cmd,
+	}
 	return result, nil
 }
 
