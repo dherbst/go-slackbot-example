@@ -150,6 +150,7 @@ func GifCommand(cmd *SlackCommand) (*SlackResult, error) {
 		Username:     "DramaFever",
 		IconUrl:      "http://slack.dramafever.com/gif/df-flame.png",
 		Text:         cmd.Text,
+		Channel:      "#" + cmd.ChannelName,
 		Attachments: []*SlackAttachment{
 			&SlackAttachment{
 				ImageUrl: "http://dramafeverslack.appspot.com/gif/heirs7_1.gif",
