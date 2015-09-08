@@ -1,6 +1,7 @@
 package slackbot
 
 import (
+	"appengine"
 	"errors"
 	"fmt"
 	"net/http"
@@ -25,7 +26,7 @@ type SlackCommand struct {
 type SlackResult struct {
 	Command      *SlackCommand      `json:"-"` // ignored
 	IsTextResult bool               `json:"-"`
-	Text         string             `json:"text,omitempty"`
+	Text         string             `json:"text"`
 	Username     string             `json:"username,omitempty"`
 	IconUrl      string             `json:"icon_url,omitempty"`
 	IconEmoji    string             `json:"icon_emoji,omitempty"`
@@ -60,6 +61,7 @@ func UnMarshalCommand(r *http.Request) (*SlackCommand, error) {
 
 // Dispatch the command based on the parameter
 func CommandHandler(w http.ResponseWriter, r *http.Request) {
+
 	command, err := UnMarshalCommand(r)
 	if err != nil {
 		http.Error(w, "Could not process command", http.StatusBadRequest)
@@ -68,15 +70,16 @@ func CommandHandler(w http.ResponseWriter, r *http.Request) {
 
 	result, err := ProcessCommand(command) // HL
 	if err != nil {
-		http.Error(w, "Error processing result", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Error processing result %v", err), http.StatusInternalServerError)
 		return
 	}
 	if result.IsTextResult { // HL
 		fmt.Fprintf(w, "%v", result.Text)
 	} else {
-		err = SendResult(result) // HL
+		c := appengine.NewContext(r)
+		err = SendResult(c, result) // HL
 		if err != nil {
-			http.Error(w, "Error processing result", http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error processing result %v", err), http.StatusInternalServerError)
 			return
 		}
 		http.Error(w, "", http.StatusNoContent) // return a 204
@@ -121,7 +124,7 @@ func UnknownCommand(cmd *SlackCommand) (*SlackResult, error) {
 }
 
 // SendResult sends the result.Text to the same channel it came from
-func SendResult(result *SlackResult) error {
+func SendResult(c appengine.Context, result *SlackResult) error {
 	if result.IsTextResult {
 		return errors.New("Sending text result to non-text send")
 	}
@@ -131,7 +134,7 @@ func SendResult(result *SlackResult) error {
 		return err
 	}
 
-	err = PostHook(hook, result)
+	err = PostHook(c, hook, result)
 
 	return err
 }
@@ -144,10 +147,14 @@ func GifCommand(cmd *SlackCommand) (*SlackResult, error) {
 	//attachments[0] = a
 	result := &SlackResult{
 		IsTextResult: false,
-		Text:         "",
+		Username:     "DramaFever",
+		IconUrl:      "http://slack.dramafever.com/gif/df-flame.png",
+		Text:         cmd.Text,
 		Attachments: []*SlackAttachment{
 			&SlackAttachment{
-				ImageUrl: "http://dramafeverslack.appspot.com/gif/heirs7_1.gif"},
+				ImageUrl: "http://dramafeverslack.appspot.com/gif/heirs7_1.gif",
+				ThumbUrl: "http://dramafeverslack.appspot.com/gif/heirs7_1.gif",
+			},
 		},
 		Command: cmd,
 	}

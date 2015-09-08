@@ -1,6 +1,7 @@
 package slackbot
 
 import (
+	"appengine/aetest"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -50,7 +51,11 @@ func TestPostHook(t *testing.T) {
 		},
 	}
 
-	err = PostHook(hook, result)
+	c, err := aetest.NewContext(nil)
+	if err != nil {
+		t.Fatalf("Error getting context %v\n", err)
+	}
+	err = PostHook(c, hook, result)
 	if err != nil {
 		t.Fatalf("Error in PostHook %v", err)
 	}

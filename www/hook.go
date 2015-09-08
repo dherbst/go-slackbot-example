@@ -1,6 +1,8 @@
 package slackbot
 
 import (
+	"appengine"
+	"appengine/urlfetch"
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -28,16 +30,16 @@ func GetHook(result *SlackResult) (*Hook, error) {
 }
 
 // PostHook sends the json payload to the slack incoming hook url
-func PostHook(hook *Hook, result *SlackResult) error {
+func PostHook(c appengine.Context, hook *Hook, result *SlackResult) error {
 
 	postbody, err := json.Marshal(result)
 	if err != nil {
 		return err
 	}
 
+	client := urlfetch.Client(c)
 	req, err := http.NewRequest("POST", hook.Url, bytes.NewBuffer(postbody))
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
