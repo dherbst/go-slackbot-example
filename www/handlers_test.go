@@ -9,7 +9,7 @@ import (
 )
 
 func TestVersionHandler(t *testing.T) {
-	request, err := http.NewRequest("GET", "/api/1/verison", nil)
+	request, err := http.NewRequest("GET", "/api/1/version", nil)
 	if err != nil {
 		t.FailNow()
 	}
