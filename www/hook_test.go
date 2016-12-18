@@ -47,7 +47,7 @@ func TestPostHook(t *testing.T) {
 	result := &SlackResult{
 		Text: "",
 		Attachments: []*SlackAttachment{
-			&SlackAttachment{ImageUrl: "http://example.com/mygif.gif"},
+			{ImageUrl: "http://example.com/mygif.gif"},
 		},
 	}
 
